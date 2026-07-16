@@ -71,7 +71,6 @@ class Item:
         raise NotImplementedError("TODO (Day 1): implement __lt__")
 
     def __bool__(self) -> bool:
-        """TODO (Day 1): an Item is "truthy" if it has any value at all —
-        a zero-value junk item should be falsy.
-        """
-        raise NotImplementedError("TODO (Day 1): implement __bool__")
+        # Caveat: while this satisfy our current specs, this treats negative values as truthy too. 
+        # If our domain wants “truthy only when value is positive,” then we would want self.value > 0 instead. 
+        return self.value != 0
