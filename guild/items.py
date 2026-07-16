@@ -45,11 +45,9 @@ class Item:
         return f"{self.name} ({self.rarity.name.capitalize()}, {self.value}g)"
 
     def __eq__(self, other: object) -> bool:
-        """TODO (Day 1): two Items are equal when name, rarity AND value
-        all match. Remember to return NotImplemented (not False) if
-        `other` isn't an Item.
-        """
-        raise NotImplementedError("TODO (Day 1): implement __eq__")
+        if not isinstance(other, Item):
+            return NotImplemented
+        return (self.name, self.rarity, self.value) == (other.name, other.rarity, other.value)
 
     def __hash__(self) -> int:
         """TODO (Day 1): must stay consistent with __eq__ above — equal
