@@ -39,10 +39,7 @@ class Item:
         self.value = value
 
     def __repr__(self) -> str:
-        """TODO (Day 1): an unambiguous, reconstructable representation —
-        should look like: Item(name='Iron Sword', rarity=COMMON, value=10)
-        """
-        raise NotImplementedError("TODO (Day 1): implement __repr__")
+        return f"Item(name={self.name!r}, rarity={self.rarity.name}, value={self.value})"
 
     def __str__(self) -> str:
         """TODO (Day 1): a human-readable line — should look like:
