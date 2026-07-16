@@ -53,10 +53,9 @@ class Item:
         return hash((self.name, self.rarity, self.value))
 
     def __lt__(self, other: object) -> bool:
-        """TODO (Day 1): order by rarity first, then value as a tiebreaker.
-        Return NotImplemented if `other` isn't an Item.
-        """
-        raise NotImplementedError("TODO (Day 1): implement __lt__")
+        if not isinstance(other, Item):
+            return NotImplemented
+        return (self.rarity, self.value) < (other.rarity, other.value)
 
     def __bool__(self) -> bool:
         # Caveat: while this satisfy our current specs, this treats negative values as truthy too. 
