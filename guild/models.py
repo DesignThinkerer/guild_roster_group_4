@@ -71,36 +71,36 @@ class Character:
     # --- Day 1 dunder set -------------------------------------------------
 
     def __repr__(self) -> str:
-        """ should look like
+        """TODO (Day 1): should look like
         Warrior(name='Grom', level=2, hp=30)
         """
-        return f"{self.describe_role()}(name='{self.name}', level={self.level}, hp={self.hp})"
+        raise NotImplementedError("TODO (Day 1): implement Character.__repr__")
 
     def __str__(self) -> str:
-        """should look like
+        """TODO (Day 1): should look like
         Grom the Warrior (Lv.2, 30 HP)
         """
-        return f"{self.name} the {self.describe_role()} (Lv.{self.level}, {self.hp} HP)"
+        raise NotImplementedError("TODO (Day 1): implement Character.__str__")
 
-    def __eq__(self, other: Character) -> bool:
-        """two Characters are equal when they're the same
+    def __eq__(self, other: object) -> bool:
+        """TODO (Day 1): two Characters are equal when they're the same
         concrete type, AND have the same name AND the same level.
         """
-        return type(self) == type(other) and self.name == other.name and self.level == other.level
+        raise NotImplementedError("TODO (Day 1): implement Character.__eq__")
 
     def __hash__(self) -> int:
-        """must stay consistent with __eq__ above."""
-        return hash((type(self), self.name, self.level))
+        """TODO (Day 1): must stay consistent with __eq__ above."""
+        raise NotImplementedError("TODO (Day 1): implement Character.__hash__")
 
-    def __lt__(self, other: Character) -> bool:
+    def __lt__(self, other: object) -> bool:
         """TODO (Day 1): order by level — this is what lets a Roster
         (Day 2) be sorted() directly with no key= needed.
         """
-        return self.level < other.level
+        raise NotImplementedError("TODO (Day 1): implement Character.__lt__")
 
     def __bool__(self) -> bool:
         """TODO (Day 1): a character is "truthy" while alive (hp > 0)."""
-        return self.hp > 0
+        raise NotImplementedError("TODO (Day 1): implement Character.__bool__")
 
 
 class Warrior(Character):
