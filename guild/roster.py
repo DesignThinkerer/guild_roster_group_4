@@ -11,10 +11,7 @@ protocol methods are TODOs.
 """
 from __future__ import annotations
 
-from html.parser import charref
-from typing import Any, Dict, Iterator, List
-
-import select
+from typing import Any, Dict, Iterator, List, Iterable
 
 from .models import Character
 
@@ -108,7 +105,6 @@ class RosterIterator:
 
     def __iter__(self) -> RosterIterator:
         """ an iterator must be iterable (return itself)."""
-        self._index = 0
         return self
 
     def __next__(self) -> Character:
@@ -129,7 +125,7 @@ class Roster:
     iteration.
     """
 
-    def __init__(self, characters: Iterator[Character] = ()):
+    def __init__(self, characters: Iterable[Character] = ()):
         self._characters: List[Character] = list(characters)
 
     def __getitem__(self, index: int) -> Character:
@@ -142,7 +138,7 @@ class Roster:
         self._characters[index] = value
 
     def __delitem__(self, index: int) -> None:
-        self._characters.pop(index)
+        del self._characters[index]
 
     def __contains__(self, item: Character) -> bool:
         return item in self._characters
