@@ -11,6 +11,7 @@ protocol methods are TODOs.
 """
 from __future__ import annotations
 
+from html.parser import charref
 from typing import Any, Dict, Iterator, List
 
 from .models import Character
@@ -124,20 +125,27 @@ class Roster:
         self._characters: List[Character] = list(characters)
 
     def __getitem__(self, index: int) -> Character:
-        raise NotImplementedError("TODO (Day 2): implement Roster.__getitem__")
+        #-- raise NotImplementedError("TODO (Day 2): implement Roster.__getitem__")
+        return self._characters[index]
 
     def __setitem__(self, index: int, value: Character) -> None:
-        """TODO (Day 2): reject non-Character values with a TypeError."""
-        raise NotImplementedError("TODO (Day 2): implement Roster.__setitem__")
+        # TODO (Day 2): reject non-Character values with a TypeError."""
+        # "TODO (Day 2): implement Roster.__setitem__")
+        if not isinstance(value, Character):
+            raise TypeError()
+        self._characters[index] = value
 
     def __delitem__(self, index: int) -> None:
-        raise NotImplementedError("TODO (Day 2): implement Roster.__delitem__")
+        # TODO (Day 2): implement Roster.__delitem__")
+        self._characters.pop(index)
 
     def __contains__(self, item: Character) -> bool:
-        raise NotImplementedError("TODO (Day 2): implement Roster.__contains__")
+        # TODO (Day 2): implement Roster.__contains__")
+        return item in self._characters
 
     def __len__(self) -> int:
-        raise NotImplementedError("TODO (Day 2): implement Roster.__len__")
+        # TODO (Day 2): implement Roster.__len__")
+        return len(self._characters)
 
     def __iter__(self) -> RosterIterator:
         """TODO (Day 2): return a RosterIterator over this roster's
@@ -147,10 +155,12 @@ class Roster:
         raise NotImplementedError("TODO (Day 2): implement Roster.__iter__")
 
     def __repr__(self) -> str:
-        raise NotImplementedError("TODO (Day 2): implement Roster.__repr__")
+        #-- raise NotImplementedError("TODO (Day 2): implement Roster.__repr__")
+        return f"Roster<Character>:{self._characters}"
 
     def add(self, character: Character) -> None:
-        raise NotImplementedError("TODO (Day 2): implement Roster.add")
+        # raise NotImplementedError("TODO (Day 2): implement Roster.add")
+        self._characters.append(character)
 
     def alive_characters(self) -> Iterator[Character]:
         """TODO (Day 2): a generator (use `yield`) that yields only the
@@ -165,4 +175,5 @@ class Roster:
         """TODO (Day 2): return characters sorted by level. Should need
         no key= argument at all if Character.__lt__ (Day 1) is correct.
         """
-        raise NotImplementedError("TODO (Day 2): implement Roster.sorted_by_level")
+        #-- raise NotImplementedError("TODO (Day 2): implement Roster.sorted_by_level")
+        return sorted(self._characters)
