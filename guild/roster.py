@@ -70,15 +70,21 @@ class StatCalculator:
         self.cache_hits = 0
 
     def __call__(self, character: Character, difficulty: int) -> int:
-        """TODO (Day 2): build a cache key from (type name, level,
-        difficulty). If it's already in self._cache, increment
-        self.cache_hits and return the cached value. Otherwise compute a
-        result (any deterministic formula is fine — e.g.
-        (character.level * 7 + difficulty * 13) % 100), store it in the
-        cache, and return it. Increment self.calls every time this is
-        called, regardless of hit or miss.
-        """
-        raise NotImplementedError("TODO (Day 2): implement StatCalculator.__call__")
+        if not isinstance(character, Character):
+            raise TypeError("StatCalculator only accepts Character instances")
+        if not isinstance(difficulty, int):
+            raise TypeError("StatCalculator only accepts int difficulty values")
+
+        self.calls += 1
+        key = (character.__class__.__name__, character.level, difficulty)
+
+        if key in self._cache:
+            self.cache_hits += 1
+            return self._cache[key]
+
+        result = (character.level * 7 + difficulty * 13) % 100
+        self._cache[key] = result
+        return result
 
 
 # --- Dev C: full container protocol + iterator protocol from scratch -------
