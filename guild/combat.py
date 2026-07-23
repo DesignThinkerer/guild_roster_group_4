@@ -30,32 +30,94 @@ def battle(
     enemy_hp: int = 30,
     enemy_attack: int = 5,
 ) -> Generator[Dict, str, None]:
-    """TODO (Day 3): a generator-based combat loop.
-
-    Requirements:
-      - Append a "X appears!" style line to combat_log at the start.
-      - Loop while both character_hp and enemy_hp are above 0. Each
-        iteration: `action = yield {...state snapshot...}`, then handle
-        action in ("attack", "heal", "flee") plus a fallback for unknown
-        actions. "attack" reduces enemy_hp; "heal" restores some
-        character_hp (capped at character.base_hp * character.level);
-        "flee" should `return` immediately (ending the generator).
-      - After a successful attack, if the enemy is still alive, it hits
-        back (reduce character_hp by enemy_attack).
-      - When the loop ends naturally (someone hit 0 hp), yield one final
-        state dict with an "outcome" key ("victory" or "defeat").
-      - Wrap the whole thing in try/except AmbushError: catching an
-        ambush thrown in via .throw() should apply damage and yield a
-        state dict with "ambushed": True.
-      - Use `finally` to append a "Combat generator closed." line to
-        combat_log — this must run whether the generator ends via
-        `return`, naturally, or via .close() (which raises GeneratorExit
-        at the suspended yield point). Do not `yield` from inside a
-        finally block that's handling GeneratorExit — that will raise a
-        RuntimeError.
-
-    `combat_log` is a list supplied by the caller (not returned) because
-    generator locals disappear once the frame ends — this is why the log
-    needs to live outside the generator itself.
     """
-    raise NotImplementedError("TODO (Day 3): implement battle()")
+      Simulates a turn-based combat encounter using a coroutine.
+
+      This generator yields the current combat state to the caller and pauses.
+      The caller must resume execution by sending an action command via `.send()`. 
+      It also handles external interruptions (like ambushes) injected via `.throw()`.
+
+      Args:
+          character: The player's Character instance.
+          combat_log: A list updated in-place with the battle's narrative events.
+          enemy_name: The name of the opponent. Defaults to "Goblin".
+          enemy_hp: The opponent's starting hit points. Defaults to 30.
+          enemy_attack: The damage the opponent deals on a counter-attack. Defaults to 5.
+
+      Yields:
+          Dict: A dictionary representing the current state of the battle, or
+                the final outcome ("victory" or "defeat").
+
+      Receives (via generator.send()):
+          str: The action the character should take ("attack", "heal", "flee").
+    """
+    try:
+      # Log the start of the battle
+      combat_log.append(f"{enemy_name} appears!")
+      
+      # Combat loop until victory or defeat
+      while character.hp > 0 and enemy_hp > 0:
+        
+        # stat snapshot to yield to the caller
+        state = {
+          "character_hp": character.hp,
+          "enemy_hp": enemy_hp,
+          "enemy_name": enemy_name,
+        }
+
+        try:
+          # suspend the generator and wait for an action to be sent in
+          action = yield state
+          
+          # Handle the action recieved from send()
+          match action: 
+            case "attack":
+              # default to 10 if no explicit attack attribute
+              attack_power = getattr(character, "attack", 10)
+              enemy_hp -= attack_power
+              combat_log.append(
+                f"{character.name} hits {enemy_name} for {attack_power} damage!"
+              )
+              
+              # counter-attack if the enemy is still alive
+              if enemy_hp > 0:
+                character.hp -= enemy_attack
+                combat_log.append(
+                  f"{enemy_name} hits {character.name} for {enemy_attack} damage!"
+                )
+            case "heal":
+              # heal the character, capped at max HP
+              max_hp = character.base_hp * character.level
+              heal_amount = min(max_hp - character.hp, 10)
+              character.hp += heal_amount
+              combat_log.append(f"{character.name} heals for {heal_amount} HP!")
+            case "flee":
+              combat_log.append(f"{character.name} flees from battle!")
+              # raises StopIteration to exit the generator cleanly
+              return
+            case _:
+              combat_log.append(f"Unknown action: {action}")
+        except AmbushError:
+          # triggered if the caller throws an AmbushError into the generator:
+          # gen.throw(AmbushError) 
+          ambush_damage = 15
+          character.hp -= ambush_damage
+          combat_log.append("Ambush!")
+          combat_log.append(
+            f"{character.name} was ambushed and takes {ambush_damage} damage!"
+          )
+          
+          # merge the updated state after the ambush``
+          yield state | {
+            "ambushed": True,
+            "character_hp": character.hp
+          }
+
+      if character.hp <= 0:
+        combat_log.append(f"{character.name} is defeated!")
+        yield {"outcome": "defeat"}
+      else:
+        combat_log.append(f"{character.name} is victorious!")
+        yield {"outcome": "victory"}
+    finally:
+      combat_log.append("Combat generator closed.")
