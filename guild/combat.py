@@ -58,51 +58,57 @@ def battle(
     generator locals disappear once the frame ends — this is why the log
     needs to live outside the generator itself.
     """
-    # ensure cleanup happens even if the generator is closed or an exception occurs
     try:
       combat_log.append(f"{enemy_name} appears!")
       while character.hp > 0 and enemy_hp > 0:
-          state = {
-                  "character_hp": character.hp,
-                  "enemy_hp": enemy_hp,
-                  "enemy_name": enemy_name,
-          }
+        state = {
+          "character_hp": character.hp,
+          "enemy_hp": enemy_hp,
+          "enemy_name": enemy_name,
+        }
+
+        try:
+          action = yield state
           
-          try:
-              action = yield state
-              
-              match action:
-                case "attack":
-                  enemy_hp -= character.attack
-                  combat_log.append(f"{character.name} attacks {enemy_name} for {character.attack} damage!")
-                  if enemy_hp > 0:
-                      character.hp -= enemy_attack
-                      combat_log.append(f"{enemy_name} attacks {character.name} for {enemy_attack} damage!")
-               
-                case "heal":
-                    max_hp = character.base_hp * character.level
-                    heal_amount = min(max_hp - character.hp, 10)
-                    character.hp += heal_amount
-                    combat_log.append(f"{character.name} heals for {heal_amount} HP!")
-                
-                case "flee":
-                    combat_log.append(f"{character.name} flees from battle!")
-                    return
-                
-                case _:
-                    combat_log.append(f"Unknown action: {action}")
-                    
-          except AmbushError:
-              ambush_damage = 15
-              character.hp -= ambush_damage
-              combat_log.append(f"{character.name} was ambushed and takes {ambush_damage} damage!")
-              yield state | {"ambushed": True, "character_hp": character.hp}
-              
+          match action: 
+            case "attack":
+              attack_power = getattr(character, "attack", 10)
+              enemy_hp -= attack_power
+              combat_log.append(
+                f"{character.name} hits {enemy_name} for {attack_power} damage!"
+              )
+              if enemy_hp > 0:
+                character.hp -= enemy_attack
+                combat_log.append(
+                  f"{enemy_name} hits {character.name} for {enemy_attack} damage!"
+                )
+            case "heal":
+              max_hp = character.base_hp * character.level
+              heal_amount = min(max_hp - character.hp, 10)
+              character.hp += heal_amount
+              combat_log.append(f"{character.name} heals for {heal_amount} HP!")
+            case "flee":
+              combat_log.append(f"{character.name} flees from battle!")
+              return
+            case _:
+              combat_log.append(f"Unknown action: {action}")
+        except AmbushError:
+          ambush_damage = 15
+          character.hp -= ambush_damage
+          combat_log.append("Ambush!")
+          combat_log.append(
+            f"{character.name} was ambushed and takes {ambush_damage} damage!"
+          )
+          yield state | {
+            "ambushed": True,
+            "character_hp": character.hp
+          }
+
       if character.hp <= 0:
-          combat_log.append(f"{character.name} is defeated!")
-          yield {"outcome": "defeat"}
+        combat_log.append(f"{character.name} is defeated!")
+        yield {"outcome": "defeat"}
       else:
-          combat_log.append(f"{character.name} is victorious!")
-          yield {"outcome": "victory"}
+        combat_log.append(f"{character.name} is victorious!")
+        yield {"outcome": "victory"}
     finally:
-        combat_log.append("Combat generator closed.")
+      combat_log.append("Combat generator closed.")
