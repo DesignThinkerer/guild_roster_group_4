@@ -25,12 +25,8 @@ def guild_quests() -> Iterator[Quest]:
     yield {"name": "Retrieve the Lost Banner", "reward_gold": 60, "min_level": 3}
     yield {"name": "Defend the Outpost", "reward_gold": 90, "min_level": 5}
 
-
 def event_quests() -> Iterator[Quest]:
     yield {"name": "Harvest Festival Errand", "reward_gold": 15, "min_level": 1}
-
-
-# --- TODO (Day 3): combine sources with itertools.chain ---------------------
 
 def combined_quest_feed() -> Iterator[Quest]:
     return itertools.chain(daily_quests(), guild_quests(), event_quests())
