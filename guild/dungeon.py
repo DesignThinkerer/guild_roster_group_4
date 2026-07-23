@@ -62,18 +62,24 @@ def dungeon_floors(dungeon_log: List[str]) -> Iterator[Dict]:
 
 @contextmanager
 def guild_transaction(treasury: Dict[str, int]) -> Iterator[Dict[str, int]]:
-    """TODO: simulates a database transaction over an in-memory treasury
-    dict — mutations inside the `with` block are kept if the block
-    completes without error, and rolled back to the pre-block snapshot if
-    it raises.
-
-    Requirements:
-      - Take a snapshot (a copy) of `treasury` before yielding it.
-      - `yield treasury` so the caller can mutate it directly inside the
-        `with` block.
-      - If an exception occurs inside the block, restore `treasury` to
-        the snapshot's contents, then re-raise the exception — do NOT
-        suppress it. (Suppressing would mean *not* re-raising; that would
-        be the wrong choice here, and worth being able to explain why.)
     """
-    raise NotImplementedError("TODO (Day 3): implement guild_transaction")
+    Suppressing the exception would be the wrong choice here:
+    the with block would simply finishes silently, and execution would continue 
+    to the next line of the main program. 
+    
+    The caller would have absolutely no idea that their transaction failed
+    and was rolled back. They would assume the purchase/trade succeeded,
+    potentially leading to logical bugs later in the game 
+    (e.g., handing over an item to a player even though they didn't 
+    actually pay for it). 
+    
+    Re-raising forces the caller to acknowledge that the transaction blew up.
+    """
+    # Take a snapshot of the treasury
+    snapshot = treasury.copy()
+    try:
+        yield treasury  # Allow the caller to mutate the treasury
+    except BaseException:
+        treasury.clear()
+        treasury.update(snapshot)
+        raise 
