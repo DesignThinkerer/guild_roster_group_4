@@ -182,31 +182,25 @@ class Paladin(HealerMixin, TankMixin, Warrior):
 # --- Day 4 (independent mixin, not part of the conflict above) ------------
 
 class LoggableMixin:
-    """TODO (Day 4, other dev): logs every attribute assignment on the
-    instance into self._log (a list of strings).
-
-    Two things to get right:
-      1. __init__ needs to set up self._log = [] BEFORE calling
-         super().__init__(...), and must do so via self.__dict__ directly
-         (not `self._log = []`) to avoid triggering your own __setattr__
-         override recursively before _log exists.
-      2. __setattr__ should append an entry (e.g. f"{name} = {value!r}")
-         for every assignment except to _log itself, then still actually
-         perform the assignment via super().__setattr__(...).
-
-    `log` should be a read-only property returning a copy of the list
-    (not the live list itself).
     """
+    Logs every attribute assignemet on the instance into self._log
+    """
+    
 
     def __init__(self, *args, **kwargs):
-        raise NotImplementedError("TODO (Day 4): implement LoggableMixin.__init__")
+        self.__dict__["_log"] = []  # avoid recursion into __setattr__ before _log exists
+        super().__init__(*args, **kwargs)
 
     def __setattr__(self, name: str, value) -> None:
-        raise NotImplementedError("TODO (Day 4): implement LoggableMixin.__setattr__")
+        # log every attribute changes except to _log itself
+        if name != "_log":
+            self._log.append(f"{name} = {value!r}")
+        super().__setattr__(name, value)
 
     @property
     def log(self) -> list:
-        raise NotImplementedError("TODO (Day 4): implement LoggableMixin.log")
+        # return a shallow copy of the log to prevent external mutation
+        return self._log.copy()
 
 
 class LoggedMage(LoggableMixin, Mage):
