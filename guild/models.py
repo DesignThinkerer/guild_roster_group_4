@@ -24,34 +24,38 @@ from .fields import IntField, StringField
 
 
 class GuildMeta(type):
-    """TODO (Day 5): a metaclass that automatically registers every
-    concrete Character subclass by name — direct analogue of how Odoo's
-    ORM collects model classes into its model registry at class-creation
-    time, not at instantiation time.
+    """Metaclass that automatically registers concrete Character subclasses.
 
-    Two things your __new__ needs to do, after creating the class via
-    super().__new__(...):
-      1. Skip registration for the base Character class itself (it has no
-         `bases`, i.e. `bases == ()`).
-      2. For every other (concrete) subclass: validate that it has an int
-         `base_hp` class attribute (directly or inherited) — raise
-         TypeError if not — then add it to `GuildMeta.registry` keyed by
-         class name.
+    Similar to an ORM's model registry, this collects playable character
+    classes at definition time rather than instantiation time. It populates
+    the `GuildMeta.registry` dictionary with the class name as the key and 
+    the class object as the value.
 
-    Once this works, go to the bottom of this file and change
-    `class Character:` to `class Character(metaclass=GuildMeta):` — the
-    registry is useless to Character until that line changes.
+    Behaviors:
+      - Skips registration for the base class itself.
+      - Validates that every concrete subclass defines an integer `base_hp`
+        attribute, raising a TypeError if it is missing or invalid.
     """
 
     registry: Dict[str, Type["Character"]] = {}
 
     def __new__(mcs, name, bases, namespace, **kwargs):
-        raise NotImplementedError("TODO (Day 5): implement GuildMeta.__new__")
+        # create the class first
+        cls = super().__new__(mcs, name, bases, namespace, **kwargs)
+        
+        # skip registration for the base Character class
+        if not bases:
+           return cls
+        # validate and register concrete subclasses
+        if not isinstance(getattr(cls, 'base_hp', None), int):
+            raise TypeError(f"{name} must have an int base_hp attribute")
+        
+        mcs.registry[name] = cls
+        
+        return cls
 
 
-# TODO (Day 5, last step): once GuildMeta works, change the line below to:
-#     class Character(metaclass=GuildMeta):
-class Character:
+class Character(metaclass=GuildMeta):
     """Base class for every playable character."""
 
     name = StringField(max_length=50)
