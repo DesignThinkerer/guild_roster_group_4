@@ -48,11 +48,12 @@ def endless_bounty_quests() -> Iterator[Quest]:
     increasing reward, e.g. reward_gold = 10 + i * 5 and
     min_level = 1 + i // 3 for i starting at 1.
     """
-    reward_gen = itertools.count(start=10, step=5)
-    level_gen = itertools.count(start=1, step=1/3)
-    i = 0
-    while i:= i + 1:
-        yield {"name": f"Bounty Contract #{i}", "reward_gold": next(reward_gen), "min_level": next(level_gen)}
+    for i in itertools.count(start=1):
+        yield {
+            "name": f"Bounty Contract #{i}",
+            "reward_gold": 10 + i * 5,
+            "min_level": 1 + i // 3
+        }
 
 
 def first_n_bounties(n: int) -> List[Quest]:
