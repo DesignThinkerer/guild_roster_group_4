@@ -18,7 +18,7 @@ which of the above TODOs you've reached.
 """
 from __future__ import annotations
 
-from typing import Dict, Type
+from typing import Dict, Optional, Type
 
 from .fields import IntField, StringField
 
@@ -142,11 +142,14 @@ class HealerMixin:
     heal_power: int = 5
 
     def describe_role(self) -> str:
-        raise NotImplementedError("TODO (Day 4): implement HealerMixin.describe_role")
-
-    def heal(self, target: "Character", amount: int = None) -> int:
-        raise NotImplementedError("TODO (Day 4): implement HealerMixin.heal")
-
+        return f"{super().describe_role()} + Healer"
+    
+    def heal(self, target: "Character", amount: Optional[int] = None) -> int:
+        if amount is None:
+            amount = self.heal_power
+        max_hp = target.base_hp * target.level
+        target.hp = min(target.hp + amount, max_hp)
+        return target.hp
 
 class TankMixin:
     """TODO (Day 4): adds taunt/aggro behavior.
