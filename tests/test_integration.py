@@ -51,3 +51,17 @@ def test_full_party_workflow():
                     )
     except ValidationErrorGroup:
         pass  # expected: Jaina (level 2) triggers this
+
+
+def test_full_party_initialization_day_1_and_2():
+    roster = Roster()
+    warrior = Warrior("Grom", level=4)
+    mage = Mage("Jaina", level=2)
+    paladin = Paladin("Uther", level=6)
+
+    roster.add(warrior)
+    roster.add(mage)
+    roster.add(paladin)
+
+    assert len(roster) == 3
+    assert roster.sorted_by_level() == [mage, warrior, paladin]
