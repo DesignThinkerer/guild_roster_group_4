@@ -49,5 +49,9 @@ def test_full_party_workflow():
                     errors.append(
                         RangeError("level", character.level, minimum=3)
                     )
-    except ValidationErrorGroup:
-        pass  # expected: Jaina (level 2) triggers this
+    except ValidationErrorGroup as e:
+        assert len(e.errors) >= 1
+        assert "; ".join(str(err) for err in errors) in str(e)
+        for error in e.errors:
+            assert isinstance(error, RangeError)
+            assert error.value < 3
