@@ -38,7 +38,9 @@ def test_full_party_workflow():
             if t["gold"] < 0:
                 raise ValueError("Treasury cannot go negative")
     except ValueError:
-        pass
+        assert True # Check error has been re-raised
+    else:
+        assert False # error has not been re-raised
     assert treasury["gold"] == 200  # unchanged, rollback worked
 
     # Day 3/4: batch validation collecting multiple problems at once
