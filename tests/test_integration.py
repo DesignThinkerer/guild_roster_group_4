@@ -38,7 +38,9 @@ def test_full_party_workflow():
             if t["gold"] < 0:
                 raise ValueError("Treasury cannot go negative")
     except ValueError:
-        pass
+        assert True # Check error has been re-raised
+    else:
+        assert False # error has not been re-raised
     assert treasury["gold"] == 200  # unchanged, rollback worked
 
     # Day 3/4: batch validation collecting multiple problems at once
@@ -52,16 +54,18 @@ def test_full_party_workflow():
     except ValidationErrorGroup:
         pass  # expected: Jaina (level 2) triggers this
 
-
-def test_full_party_initialization_day_1_and_2():
+def test_full_party_quest_matching_day_6():
     roster = Roster()
-    warrior = Warrior("Grom", level=4)
-    mage = Mage("Jaina", level=2)
-    paladin = Paladin("Uther", level=6)
+    roster.add(Warrior("Grom", level=4))
+    roster.add(Mage("Jaina", level=2))
+    roster.add(Paladin("Uther", level=6))
 
-    roster.add(warrior)
-    roster.add(mage)
-    roster.add(paladin)
+    quests = list(combined_quest_feed())
+    matches = eligible_assignments(roster, quests)
 
-    assert len(roster) == 3
-    assert roster.sorted_by_level() == [mage, warrior, paladin]
+    assert {character.name for character, _ in matches} == {
+        "Grom",
+        "Jaina",
+        "Uther",
+    }
+    assert all(character.level >= quest["min_level"] for character, quest in matches)
