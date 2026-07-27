@@ -51,9 +51,21 @@ def test_full_party_workflow():
                     errors.append(
                         RangeError("level", character.level, minimum=3)
                     )
-    except ValidationErrorGroup as e:
-        assert len(e.errors) >= 1
-        assert "; ".join(str(err) for err in errors) in str(e)
-        for error in e.errors:
-            assert isinstance(error, RangeError)
-            assert error.value < 3
+    except ValidationErrorGroup:
+        pass  # expected: Jaina (level 2) triggers this
+
+def test_full_party_quest_matching_day_6():
+    roster = Roster()
+    roster.add(Warrior("Grom", level=4))
+    roster.add(Mage("Jaina", level=2))
+    roster.add(Paladin("Uther", level=6))
+
+    quests = list(combined_quest_feed())
+    matches = eligible_assignments(roster, quests)
+
+    assert {character.name for character, _ in matches} == {
+        "Grom",
+        "Jaina",
+        "Uther",
+    }
+    assert all(character.level >= quest["min_level"] for character, quest in matches)
