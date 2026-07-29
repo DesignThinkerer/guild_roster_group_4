@@ -46,6 +46,27 @@ def test_groupby_roster_by_role():
     assert grouped["Mage"] == [party[2]]
 
 
+def test_groupby_roster_by_role_handles_non_adjacent_roles():
+    class DummyCharacter:
+        def __init__(self, name, role):
+            self.name = name
+            self._role = role
+
+        def describe_role(self):
+            return self._role
+
+    party = [
+        DummyCharacter("A", "Warrior"),
+        DummyCharacter("B", "Mage"),
+        DummyCharacter("C", "Warrior"),
+    ]
+
+    grouped = group_roster_by_role(party)
+
+    assert [character.name for character in grouped["Warrior"]] == ["A", "C"]
+    assert [character.name for character in grouped["Mage"]] == ["B"]
+
+
 def test_product_eligible_assignments():
     party = [Warrior("Grom", level=1), Rogue("Sly", level=5)]
     quests = list(combined_quest_feed())
