@@ -85,7 +85,13 @@ def group_roster_by_role(characters: Iterable[Character]) -> Dict[str, List[Char
     without the sort first, characters of the same role that aren't
     adjacent in the input would end up in separate groups.
     """
-    raise NotImplementedError("TODO (Day 3): implement group_roster_by_role")
+    sorted_characters = sorted(characters, key=lambda character: character.describe_role())
+    return {
+        role: list(group)
+        for role, group in itertools.groupby(
+            sorted_characters, key=lambda character: character.describe_role()
+        )
+    }
 
 
 # --- TODO (Day 3): itertools.product -----------------------------------------
