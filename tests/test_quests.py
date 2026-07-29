@@ -39,6 +39,25 @@ def test_takewhile_requires_presorted_input():
     assert len(under_40) == len(all_under_40)
 
 
+def test_quests_under_budget_sorts_before_takewhile():
+    quests = [
+        {"name": "High", "reward_gold": 100, "min_level": 10},
+        {"name": "Low", "reward_gold": 5, "min_level": 1},
+        {"name": "Mid", "reward_gold": 50, "min_level": 5},
+    ]
+
+    assert [q["name"] for q in quests_under_budget(quests, budget=60)] == ["Low", "Mid"]
+
+
+def test_quests_under_budget_excludes_equal_budget():
+    quests = [
+        {"name": "Cheap", "reward_gold": 9, "min_level": 1},
+        {"name": "Equal", "reward_gold": 10, "min_level": 1},
+    ]
+
+    assert [q["name"] for q in quests_under_budget(quests, budget=10)] == ["Cheap"]
+
+
 def test_groupby_roster_by_role():
     party = [Warrior("Grom", level=1), Warrior("Thok", level=2), Mage("Jaina", level=1)]
     grouped = group_roster_by_role(party)
